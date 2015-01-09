@@ -3278,7 +3278,9 @@ static void FXFormPreprocessFieldDictionary(NSMutableDictionary *dictionary)
 
 @interface FXFormDatePickerCell ()
 
+@property (nonatomic, strong) UIView *pickView;
 @property (nonatomic, strong) UIDatePicker *datePicker;
+@property (nonatomic, strong) UIButton *closeButton;
 
 @end
 
@@ -3287,8 +3289,18 @@ static void FXFormPreprocessFieldDictionary(NSMutableDictionary *dictionary)
 
 - (void)setUp
 {
-    self.datePicker = [[UIDatePicker alloc] init];
+    self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 30, 1, 1)];
     [self.datePicker addTarget:self action:@selector(valueChanged) forControlEvents:UIControlEventValueChanged];
+    
+    self.closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.datePicker.frame.size.width, 40)];
+    [self.closeButton setBackgroundColor:[self.window tintColor]];
+    [self.closeButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.closeButton setTitle:@"Done" forState:UIControlStateNormal];
+    [self.closeButton addTarget:self action:@selector(done) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.pickView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.datePicker.frame.size.width, self.datePicker.frame.size.height+30)];
+    [self.pickView addSubview:self.datePicker];
+    [self.pickView addSubview:self.closeButton];
 }
 
 - (void)update
@@ -3319,7 +3331,7 @@ static void FXFormPreprocessFieldDictionary(NSMutableDictionary *dictionary)
 
 - (UIView *)inputView
 {
-    return self.datePicker;
+    return self.pickView;
 }
 
 - (void)valueChanged
@@ -3329,6 +3341,11 @@ static void FXFormPreprocessFieldDictionary(NSMutableDictionary *dictionary)
     [self setNeedsLayout];
     
     if (self.field.action) self.field.action(self);
+}
+
+-(void)done
+{
+    [self resignFirstResponder];
 }
 
 - (void)didSelectWithTableView:(UITableView *)tableView controller:(__unused UIViewController *)controller
